@@ -11,7 +11,7 @@ public class Dictionary<K, V> {
     // Default constructor -> User can specify the internal capacity.
     public Dictionary(int capacity, double threshold) {
         if (capacity <= 0) {
-            throw new IllegalArgumentException("Capacity must be represented by a positive integer");
+            throw new IllegalArgumentException("Capacity can not be less that 0.0");
         }
 
         if (threshold <= 0.0 || threshold > 1.0) {
@@ -40,14 +40,6 @@ public class Dictionary<K, V> {
         return (Entry<K, V>[]) new Entry[capacity];
     }
 
-    public int getSize() {
-        return size;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
     // Internal helper-method for calculating current Load Factor.
     private double loadFactor() {
         return (double) this.size / this.capacity;
@@ -55,11 +47,6 @@ public class Dictionary<K, V> {
 
     private boolean rehashNeeded() {
         return this.loadFactor() >= this.threshold;
-    }
-
-    // Internal helper-method for determining if the storage array is currently full.
-    public boolean isFull() {
-        return this.size >= this.capacity;
     }
 
     private int getIndex(int hash) {
@@ -85,6 +72,8 @@ public class Dictionary<K, V> {
                 if (entry.getKey() == key) {
                     entry.addKeyAndValue(key, value);
                     return true;
+                } else {
+                    continue;
                 }
             } else {
                 // Entry is empty or dead -> We insert at this spot.
@@ -110,17 +99,22 @@ public class Dictionary<K, V> {
         for (int i = index; i < storage.length; i++) {
             int probeIndex = (index + i) % this.capacity;
             Entry<K, V> entry = this.storage[probeIndex];
+            Placeholder status = entry.getStatus();
 
-            if (entry.getStatus() == Placeholder.Occupied) {
+            if (status == Placeholder.Occupied) {
                 if (entry.getKey() == key) {
-                    return entry.getValue();
+                    V result = entry.getValue();
+                    entry.removeKeyAndValue();
+                    return result;
                 }
+            } else if (status == Placeholder.Tombstone) {
+                continue;
             } else {
                 return null;
             }
         }
 
-        // Unreachable code -> Should never execute this.
+        // Unreachable Code -> Should never execute this;
         return null;
     }
 
@@ -135,11 +129,14 @@ public class Dictionary<K, V> {
         for (int i = index; i < storage.length; i++) {
             int probeIndex = (index + i) % this.capacity;
             Entry<K, V> entry = this.storage[probeIndex];
+            Placeholder status = entry.getStatus();
 
-            if (entry.getStatus() == Placeholder.Occupied) {
+            if (status == Placeholder.Occupied) {
                 if (entry.getKey() == key) {
                     return entry.getValue();
                 }
+            } else if (status == Placeholder.Tombstone) {
+                continue;
             } else {
                 return null;
             }
@@ -149,12 +146,14 @@ public class Dictionary<K, V> {
         return null;
     }
 
+    // Rehash internal storage-array to increase storage space.
     public void rehash() {
         // Copy the current Storage-array & Occupied-list
         Entry<K, V>[] oldStorage = this.storage;
         ArrayList<Integer> oldOccupied = this.occupiedList;
 
         // Initialize everything to be new (reset)
+        // Double storage space (capacity)
         this.capacity = this.capacity * 2;
         this.storage = initializeStorage(this.capacity);
         this.occupiedList = new ArrayList<>();
@@ -169,5 +168,20 @@ public class Dictionary<K, V> {
                 this.insert(entry.getKey(), entry.getValue());
             }
         }
+    }
+
+    // Internal helper-method for returning internal size.
+    public int getSize() {
+        return size;
+    }
+
+    // Internal helper-method for returning internal capacity.
+    public int getCapacity() {
+        return capacity;
+    }
+
+    // Internal helper-method for determining if the storage array is currently full.
+    public boolean isFull() {
+        return this.size >= this.capacity;
     }
 }
