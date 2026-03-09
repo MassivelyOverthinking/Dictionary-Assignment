@@ -1,9 +1,12 @@
+import java.util.ArrayList;
+
 public class Dictionary<K, V> {
     // Internal variables
     private int size;
     private int capacity;
     private double threshold;
-    private Object[] storage;
+    private ArrayList<Integer> occupiedList;
+    private Entry<K, V>[] storage;
 
     // Default constructor -> User can specify the internal capacity.
     public Dictionary(int capacity, double threshold) {
@@ -17,20 +20,24 @@ public class Dictionary<K, V> {
 
         this.size = 0;
         this.capacity = capacity;
-        this.storage = initilizeStorage(capacity);
+        this.threshold = threshold;
+        this.occupiedList = new ArrayList<Integer>();
+        this.storage = initializeStorage(capacity);
     }
 
-    // Secondary constructor -> Capacity is dynamically allocated.
+    // Secondary constructor -> Capacity is statically allocated.
     public Dictionary() {
         this.size = 0;
         this.capacity = 100;
         this.threshold = 0.5;
-        this.storage = initilizeStorage(100);
+        this.occupiedList = new ArrayList<>();
+        this.storage = initializeStorage(100);
     }
 
     // Internal helper-method for constructing internal array of Entry-instances.
-    private Object[] initilizeStorage(int capacity) {
-        return new Object[capacity];
+    @SuppressWarnings("unchecked")
+    public Entry<K, V>[] initializeStorage(int capacity) {
+        return (Entry<K, V>[]) new Entry[capacity];
     }
 
     public int getSize() {
@@ -56,10 +63,14 @@ public class Dictionary<K, V> {
     }
 
     private int getIndex(int hash) {
-        return hash / this.capacity;
+        return Math.abs(hash) % this.capacity;
     }
 
     public boolean insert(K key, V value) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key can not by 'null'");
+        }
+
         if (this.rehashNeeded()) {
             this.rehash();
         }
@@ -68,23 +79,95 @@ public class Dictionary<K, V> {
         int index = this.getIndex(hashCode);
 
         for (int i = index; i < storage.length; i++) {
-            Entry<K, V> entry = (Entry<K, V>) this.storage[i];
+            int probeIndex = (index + i) % this.capacity;
+            Entry<K, V> entry =  this.storage[probeIndex];
             if (entry.getStatus() == Placeholder.Occupied) {
-
+                if (entry.getKey() == key) {
+                    entry.addKeyAndValue(key, value);
+                    return true;
+                }
+            } else {
+                // Entry is empty or dead -> We insert at this spot.
+                entry.addKeyAndValue(key, value);
+                this.occupiedList.add(probeIndex);
+                size++;
+                return true;
             }
         }
 
+        // Unreachable Code -> Should never execute this;
+        return false;
     }
 
-    public Entry<K, V> remove(K key) {
-        // TODO!
+    public V remove(K key) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key can not be null");
+        }
+
+        int hashCode = key.hashCode();
+        int index = this.getIndex(hashCode);
+
+        for (int i = index; i < storage.length; i++) {
+            int probeIndex = (index + i) % this.capacity;
+            Entry<K, V> entry = this.storage[probeIndex];
+
+            if (entry.getStatus() == Placeholder.Occupied) {
+                if (entry.getKey() == key) {
+                    return entry.getValue();
+                }
+            } else {
+                return null;
+            }
+        }
+
+        // Unreachable code -> Should never execute this.
+        return null;
     }
 
-    public Entry<K, V> get(K key) {
-        // TODO!
+    public V get(K key) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key can not be null");
+        }
+
+        int hashCode = key.hashCode();
+        int index = this.getIndex(hashCode);
+
+        for (int i = index; i < storage.length; i++) {
+            int probeIndex = (index + i) % this.capacity;
+            Entry<K, V> entry = this.storage[probeIndex];
+
+            if (entry.getStatus() == Placeholder.Occupied) {
+                if (entry.getKey() == key) {
+                    return entry.getValue();
+                }
+            } else {
+                return null;
+            }
+        }
+
+        // Unreachable code -> Should never execute this.
+        return null;
     }
 
     public void rehash() {
-        // TODO!
+        // Copy the current Storage-array & Occupied-list
+        Entry<K, V>[] oldStorage = this.storage;
+        ArrayList<Integer> oldOccupied = this.occupiedList;
+
+        // Initialize everything to be new (reset)
+        this.capacity = this.capacity * 2;
+        this.storage = initializeStorage(this.capacity);
+        this.occupiedList = new ArrayList<>();
+        this.size = 0;
+
+        // Iterate through old occupied-list & insert them into new list
+        for (Integer index: oldOccupied) {
+            Entry<K, V> entry = oldStorage[index];
+
+            // Safety check -> No null values & Entry is Occupied
+            if (entry.getStatus() == Placeholder.Occupied && entry.getKey() != null) {
+                this.insert(entry.getKey(), entry.getValue());
+            }
+        }
     }
 }

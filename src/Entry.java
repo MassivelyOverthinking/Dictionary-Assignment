@@ -32,4 +32,10 @@ public class Entry<K, V> {
     public void setStatus(Placeholder status) {
         this.status = status;
     }
+
+    public void addKeyAndValue(K key, V value) {
+        this.key = key;
+        this.value = value;
+        this.status = Placeholder.Occupied;
+    }
 }
