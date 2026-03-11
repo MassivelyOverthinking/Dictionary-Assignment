@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Main {
     public static void main(String[] args) {
         Dictionary<String, Integer> dictionary = new Dictionary<>();
@@ -18,5 +20,11 @@ public class Main {
         System.out.println("Result: " + result3);
         System.out.println("Result: " + result4);
         System.out.println("Result: " + result5);
+        System.out.println("\n----------------------------------------");
+
+        ArrayList<String> keysList = dictionary.keys();
+        ArrayList<Integer> valuesList = dictionary.values();
+        System.out.println("All Keys: " + keysList);
+        System.out.println("All Values: " + valuesList);
     }
 }

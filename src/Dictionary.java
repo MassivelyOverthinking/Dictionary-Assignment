@@ -175,6 +175,24 @@ public class Dictionary<K, V> {
         }
     }
 
+    // Helper-method to return all internal keys in Dictionary.
+    public ArrayList<K> keys() {
+        ArrayList<K> array = new ArrayList<>();
+        for (Integer index : occupiedList) {
+            array.add(storage[index].getKey());
+        }
+        return array;
+    }
+
+    // Helper-method to return all internal values in Dictionary.
+    public ArrayList<V> values() {
+        ArrayList<V> array = new ArrayList<>();
+        for (Integer index : occupiedList) {
+            array.add(storage[index].getValue());
+        }
+        return array;
+    }
+
     // Internal helper-method for returning internal size.
     public int getSize() {
         return size;
