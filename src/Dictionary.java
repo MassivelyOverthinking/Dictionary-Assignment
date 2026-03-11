@@ -38,7 +38,9 @@ public class Dictionary<K, V> {
     // Internal helper-method for constructing internal array of Entry-instances.
     @SuppressWarnings("unchecked")
     public Entry<K, V>[] initializeStorage(int capacity) {
+        // Create teh array.
         Entry<K, V>[] array = (Entry<K, V>[]) new Entry[capacity];
+        // Iterate and crete the Entry-instances.
         for (int i = 0; i < capacity; i++) {
             array[i] = new Entry<>();
         }
@@ -50,29 +52,38 @@ public class Dictionary<K, V> {
         return (double) this.size / this.capacity;
     }
 
+    // Internal helper-method to determine if Rehash is needed.
     private boolean rehashNeeded() {
         return this.loadFactor() >= this.threshold;
     }
 
+    // Get the internal Index by HashCode.
     private int getIndex(int hash) {
         return Math.abs(hash) % this.capacity;
     }
 
+    // Main Insert-method -> Key & Value.
     public boolean insert(K key, V value) {
+        // Check if key is null -> Cannot Hash
         if (key == null) {
             throw new IllegalArgumentException("Key can not by 'null'");
         }
 
+        // Determine if we should rehash internal storage array.
         if (this.rehashNeeded()) {
             this.rehash();
         }
 
+        // Calculate HashCode & internal Index
         int hashCode = key.hashCode();
         int index = this.getIndex(hashCode);
 
+        // Probe Chaining -> Check internal 'Placeholder' value.
         for (int i = 0; i < storage.length; i++) {
             int probeIndex = (index + i) % this.capacity;
             Entry<K, V> entry =  this.storage[probeIndex];
+
+            // If 'Occupied' => Check if duplicate value or continue.
             if (entry.getStatus() == Placeholder.Occupied) {
                 if (entry.getKey().equals(key)) {
                     entry.addKeyAndValue(key, value);
@@ -81,7 +92,7 @@ public class Dictionary<K, V> {
                     continue;
                 }
             } else {
-                // Entry is empty or dead -> We insert at this spot.
+                // Entry is empty or dead => We insert at this spot.
                 entry.addKeyAndValue(key, value);
                 this.occupiedList.add(probeIndex);
                 size++;
@@ -93,28 +104,36 @@ public class Dictionary<K, V> {
         return false;
     }
 
+    // Main Remove-method => Remove the Dictionary-value
     public V remove(K key) {
+        // Throw error if the key parameter if 'null'.
         if (key == null) {
             throw new IllegalArgumentException("Key can not be null");
         }
 
+        // Calculate HashCode & internal Index
         int hashCode = key.hashCode();
         int index = this.getIndex(hashCode);
 
+        // Perform Probe Chaining
         for (int i = 0; i < storage.length; i++) {
             int probeIndex = (index + i) % this.capacity;
             Entry<K, V> entry = this.storage[probeIndex];
             Placeholder status = entry.getStatus();
 
+            // If 'Occupied' => Check if internal key matches.
             if (status == Placeholder.Occupied) {
+                // If key matches, ew remove the related value from storage.
                 if (entry.getKey().equals(key)) {
                     V result = entry.getValue();
                     entry.removeKeyAndValue();
                     return result;
                 }
+                // If 'Tombstone' => Simply continue to next step in Chain.
             } else if (status == Placeholder.Tombstone) {
                 continue;
             } else {
+                // If 'Empty' => Chain is broken and key-value pair doesn't exist.
                 return null;
             }
         }
@@ -123,23 +142,29 @@ public class Dictionary<K, V> {
         return null;
     }
 
+    // Main get-method => Return value related to specified key.
     public V get(K key) {
+        // If key == null => System throws error.
         if (key == null) {
             throw new IllegalArgumentException("Key can not be null");
         }
 
+        // Calculate HashCode & internal Index
         int hashCode = key.hashCode();
         int index = this.getIndex(hashCode);
 
+        // Initiate Probe Chain => Search for related key-value pair
         for (int i = 0; i < storage.length; i++) {
             int probeIndex = (index + i) % this.capacity;
             Entry<K, V> entry = this.storage[probeIndex];
             Placeholder status = entry.getStatus();
 
+            // if 'Occupied' => Check if keys match & return value.
             if (status == Placeholder.Occupied) {
                 if (entry.getKey().equals(key)) {
                     return entry.getValue();
                 }
+                // If 'Tombstone' => Continue to next step in probe chain.
             } else if (status == Placeholder.Tombstone) {
                 continue;
             } else {
@@ -153,6 +178,9 @@ public class Dictionary<K, V> {
 
     // Rehash internal storage-array to increase storage space.
     public void rehash() {
+        // Print-functionality for debugging
+        System.out.println("Rehash commencing...");
+
         // Copy the current Storage-array & Occupied-list
         Entry<K, V>[] oldStorage = this.storage;
         ArrayList<Integer> oldOccupied = this.occupiedList;
@@ -173,6 +201,9 @@ public class Dictionary<K, V> {
                 this.insert(entry.getKey(), entry.getValue());
             }
         }
+
+        // Print-functionality for debugging
+        System.out.println("Rehash completed!");
     }
 
     // Helper-method to return all internal keys in Dictionary.
