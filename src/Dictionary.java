@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Dictionary<K, V> {
     // Internal variables
@@ -37,7 +38,11 @@ public class Dictionary<K, V> {
     // Internal helper-method for constructing internal array of Entry-instances.
     @SuppressWarnings("unchecked")
     public Entry<K, V>[] initializeStorage(int capacity) {
-        return (Entry<K, V>[]) new Entry[capacity];
+        Entry<K, V>[] array = (Entry<K, V>[]) new Entry[capacity];
+        for (int i = 0; i < capacity; i++) {
+            array[i] = new Entry<>();
+        }
+        return array;
     }
 
     // Internal helper-method for calculating current Load Factor.
@@ -65,11 +70,11 @@ public class Dictionary<K, V> {
         int hashCode = key.hashCode();
         int index = this.getIndex(hashCode);
 
-        for (int i = index; i < storage.length; i++) {
+        for (int i = 0; i < storage.length; i++) {
             int probeIndex = (index + i) % this.capacity;
             Entry<K, V> entry =  this.storage[probeIndex];
             if (entry.getStatus() == Placeholder.Occupied) {
-                if (entry.getKey() == key) {
+                if (entry.getKey().equals(key)) {
                     entry.addKeyAndValue(key, value);
                     return true;
                 } else {
@@ -96,13 +101,13 @@ public class Dictionary<K, V> {
         int hashCode = key.hashCode();
         int index = this.getIndex(hashCode);
 
-        for (int i = index; i < storage.length; i++) {
+        for (int i = 0; i < storage.length; i++) {
             int probeIndex = (index + i) % this.capacity;
             Entry<K, V> entry = this.storage[probeIndex];
             Placeholder status = entry.getStatus();
 
             if (status == Placeholder.Occupied) {
-                if (entry.getKey() == key) {
+                if (entry.getKey().equals(key)) {
                     V result = entry.getValue();
                     entry.removeKeyAndValue();
                     return result;
@@ -126,13 +131,13 @@ public class Dictionary<K, V> {
         int hashCode = key.hashCode();
         int index = this.getIndex(hashCode);
 
-        for (int i = index; i < storage.length; i++) {
+        for (int i = 0; i < storage.length; i++) {
             int probeIndex = (index + i) % this.capacity;
             Entry<K, V> entry = this.storage[probeIndex];
             Placeholder status = entry.getStatus();
 
             if (status == Placeholder.Occupied) {
-                if (entry.getKey() == key) {
+                if (entry.getKey().equals(key)) {
                     return entry.getValue();
                 }
             } else if (status == Placeholder.Tombstone) {

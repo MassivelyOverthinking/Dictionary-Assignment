@@ -34,5 +34,9 @@ public class CuckooDictionary<K, V> {
         return (double) this.size / this.capacity;
     }
 
+    private boolean rehashNeeded() {
+        return this.loadFactor() >= threshold;
+    }
+
 
 }
