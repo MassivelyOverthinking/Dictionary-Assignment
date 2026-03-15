@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Dictionary<K, V> {
     // Internal variables
@@ -37,7 +36,7 @@ public class Dictionary<K, V> {
 
     // Internal helper-method for constructing internal array of Entry-instances.
     @SuppressWarnings("unchecked")
-    public Entry<K, V>[] initializeStorage(int capacity) {
+    private Entry<K, V>[] initializeStorage(int capacity) {
         // Create teh array.
         Entry<K, V>[] array = (Entry<K, V>[]) new Entry[capacity];
         // Iterate and crete the Entry-instances.
@@ -77,6 +76,10 @@ public class Dictionary<K, V> {
         // Calculate HashCode & internal Index
         int hashCode = key.hashCode();
         int index = this.getIndex(hashCode);
+
+        // Debugging checks
+        System.out.println("Hashcode: " + hashCode);
+        System.out.println("First index: " + index);
 
         // Probe Chaining -> Check internal 'Placeholder' value.
         for (int i = 0; i < storage.length; i++) {
@@ -177,9 +180,10 @@ public class Dictionary<K, V> {
     }
 
     // Rehash internal storage-array to increase storage space.
-    public void rehash() {
+    private void rehash() {
         // Print-functionality for debugging
         System.out.println("Rehash commencing...");
+        System.out.println("Starting size is " + this.storage.length);
 
         // Copy the current Storage-array & Occupied-list
         Entry<K, V>[] oldStorage = this.storage;
@@ -204,6 +208,7 @@ public class Dictionary<K, V> {
 
         // Print-functionality for debugging
         System.out.println("Rehash completed!");
+        System.out.println("New storage size is " + this.storage.length);
     }
 
     // Helper-method to return all internal keys in Dictionary.
