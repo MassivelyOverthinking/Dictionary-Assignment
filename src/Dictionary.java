@@ -62,7 +62,7 @@ public class Dictionary<K, V> {
     }
 
     // Main Insert-method -> Key & Value.
-    public boolean insert(K key, V value) {
+    public V insert(K key, V value) {
         // Check if key is null -> Cannot Hash
         if (key == null) {
             throw new IllegalArgumentException("Key can not by 'null'");
@@ -89,8 +89,9 @@ public class Dictionary<K, V> {
             // If 'Occupied' => Check if duplicate value or continue.
             if (entry.getStatus() == Placeholder.Occupied) {
                 if (entry.getKey().equals(key)) {
+                    V result = entry.getValue();
                     entry.addKeyAndValue(key, value);
-                    return true;
+                    return result;
                 } else {
                     continue;
                 }
@@ -99,12 +100,12 @@ public class Dictionary<K, V> {
                 entry.addKeyAndValue(key, value);
                 this.occupiedList.add(probeIndex);
                 size++;
-                return true;
+                return null;
             }
         }
 
         // Unreachable Code -> Should never execute this;
-        return false;
+        return null;
     }
 
     // Main Remove-method => Remove the Dictionary-value
@@ -242,5 +243,10 @@ public class Dictionary<K, V> {
     // Internal helper-method for determining if the storage array is currently full.
     public boolean isFull() {
         return this.size >= this.capacity;
+    }
+
+    // Internal helper-method for determining if the storage array is currently empty.
+    public boolean isEmpty() {
+        return this.size == 0;
     }
 }
