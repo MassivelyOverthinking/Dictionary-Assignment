@@ -1,4 +1,5 @@
 # Dictionary – Generisk hash-baseret tabel i Java
+### **Simon Thorhauge Stensgaard**
 
 ## Overordnet Design
 Projektet består primært af 2 separate klasser:
