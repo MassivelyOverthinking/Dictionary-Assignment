@@ -6,9 +6,9 @@ Projektet består primært af 2 separate klasser:
 - `Dictionary<K, V>` – Den overordnede datastruktur.
 - `Entry<K, V>` – En intern 'container' til at gemme nøgle/værdi-par.
 
-Valgte yderligere at inkludere 2 `Constructor`-funktioner for nemmere at kunne teste implementationen.
-En `Constructor`-metode hvori brugeren kunne specificere både Kapacitet og tilladte `load factor` før `Rehashing`.
-En `Constructor`-metode hvori alt underliggende funktionalitet er håndteret på bagenden.
+Valgte yderligere at inkludere 2 `Constructor`-funktioner for nemmere at kunne teste implementationen.</br>
+En `Constructor`-metode hvori brugeren kunne specificere både Kapacitet og tilladte `load factor` før `Rehashing`.</br>
+En `Constructor`-metode hvori alt underliggende funktionalitet er håndteret på bagenden.</br>
 *NOTE*: Den første `Constructor`-metode kaster exceptions for at sikre at parametre værdierne ligger inden for de nødvendige intervaller.
 
 Derudover valgte jeg også at implementere en `Placeholder`-enum med statusværdier såsom:
@@ -18,6 +18,9 @@ Derudover valgte jeg også at implementere en `Placeholder`-enum med statusværd
 Grunden til at jeg valgte at benytte denne markør-værdi var, at når `Probe Chain` funktionalitet
 finder sted er det nødvendigt for vores applikation at kunne se forskel på en Tom-plads, og en
 en plads hvori der førhenværende eksisterede en værdi. `Tombstone` repræsenterer denne nødvendige status.
+
+## InitializeStorage
+For at skabe det interne `Storage`-array så alle pladser er fyldte med startende `Entry<K, V>` instancer så har jeg implementeret en generel hjælper-metode, som først kreerer det interne array baseret på den ønskede Kapacitet, og derefter løber array'et igennem og konvertere alle `null`-værdier til instanser af `Entry`. 
 
 ## Hashing
 For at sikre at vi altid ender med et konkret og korrekt index i vores interne `Storage`-array
