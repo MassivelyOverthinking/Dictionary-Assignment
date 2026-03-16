@@ -32,4 +32,6 @@ Når den interne `Load factor` overstiger den tilladte `Threshold` (RehashNeeded
 `Storage`-array og `OccupiedList`-liste, og derefter opdatere alle interne variables med ny kapacitet, nyt hash-array, ny occupied-liste,
 og ny størrelse. Derved kan jeg genanvende applikationens interne `insert`-metode til at genindsætte alle konkrete værdier. 
 
-*NOTE*: For yderligere forståelse af min Codebase så har jeg inkluderet dybdegåedne kommentarer i både `Dictionary` og `Entry` klasserne. 
+--- 
+*NOTE*: For yderligere forståelse af min Codebase så har jeg inkluderet dybdegåedne kommentarer i både `Dictionary` og `Entry` klasserne.
+*NOTE*: Please se bort fra mine ekstra klasser; `Bucket`, `BucketEntry` og `CuckooDictionary`! De var forsøg på at implementere Cuckoo-hashing funktionalitet (Side-projekt). 
